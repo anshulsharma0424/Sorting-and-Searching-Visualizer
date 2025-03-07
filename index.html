@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sorting Visualizer Playground</title>
+  <title>Sorting & Searching Visualizer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -15,8 +15,8 @@
     <label for="algorithm">Algorithm:</label>
     <select id="algorithm">
       <option value="bubble">Bubble Sort</option>
-      <option value="selection">Selection Sort</option>
       <option value="insertion">Insertion Sort</option>
+      <option value="selection">Selection Sort</option>
       <option value="merge">Merge Sort</option>
       <option value="quick">Quick Sort</option>
       <option value="heap">Heap Sort</option>
@@ -25,7 +25,7 @@
     <!-- Higher slider value means faster sort (lower delay) -->
     <input type="range" id="speed" min="10" max="500" value="250" />
     <label for="arraySize">Array Size:</label>
-    <input type="range" id="arraySize" min="10" max="150" value="50" />
+    <input type="range" id="arraySize" min="10" max="60" value="30" />
     <button id="startSort">Start Sorting</button>
     <button id="toggleExplanation">Show Explanation</button>
     <!-- Timer display -->
@@ -46,7 +46,7 @@
     <input type="number" id="searchValue" placeholder="Enter value to search" />
     <div class="search-buttons">
       <button id="linearSearchBtn">Linear Search</button>
-      <button id="binarySearchBtn" disabled>Binary Search</button>
+      <button id="binarySearchBtn">Binary Search</button>
       <button id="toggleSearchExplanation">Show Search Explanation</button>
     </div>
     <p class="note">* Binary search is available only after sorting.</p>
@@ -61,5 +61,3 @@
   <script type="module" src="script.js"></script>
 </body>
 </html>
-
-<!-- error msg when search box empt -->

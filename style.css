@@ -13,59 +13,28 @@ body {
 header {
   background-color: #3498db;
   width: 100%;
-  padding: 15px 0;
+  padding: 10px 0;
   text-align: center;
   color: #fff;
-  font-size: 28px;
-  font-weight: bold;
 }
 
 /* Controls styling */
 .controls {
   margin: 20px;
-  padding: 10px;
-  background: #f1f8ff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 10px;
 }
 
 .controls label {
   margin: 0 5px;
   font-weight: bold;
-  color: #2c3e50;
 }
 
-.controls select,
 .controls input[type="range"] {
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-/* Button styling */
-button {
-  background-color: #3498db;
-  border: none;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-button:hover {
-  background-color: #2980b9;
-  transform: scale(1.0);
-}
-
-button:active {
-  transform: scale(0.95);
+  width: 150px;
 }
 
 /* Timer display styling */
@@ -86,7 +55,6 @@ button:active {
   background-color: #fff;
   margin-bottom: 20px;
   position: relative;
-  transition: all 0.3s ease-in-out;
 }
 
 /* Bar styling */
@@ -94,11 +62,11 @@ button:active {
   position: relative;
   background-color: #3498db;
   margin: 1px;
+  /* Default width for 50 bars; will be adjusted dynamically */
   width: calc(100% / 50 - 2px);
   transition: height 0.3s ease, background-color 0.3s ease;
 }
 
-/* Number displayed at the top of each bar */
 /* Number displayed at the top of each bar */
 .bar-number {
   position: absolute;
@@ -106,78 +74,60 @@ button:active {
   left: 50%;
   transform: translateX(-50%);
   font-size: 12px;
-  color: #000; /* Changed from white to black for better visibility */
-  font-weight: bold;
+  color: #333;
 }
-
 
 /* Explanation panel styling */
 .explanation-panel {
   display: none;
   position: fixed;
-  top: 15%;
-  right: 5%;
-  width: 350px;
+  top: 10%;
+  right: 10%;
+  width: 300px;
   max-width: 90%;
-  background: linear-gradient(135deg, #f6f9fc, #e9eff5);
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 20px;
+  background: #fff;
+  border: 2px solid #ccc;
+  padding: 15px;
   z-index: 1000;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.explanation-panel h2,
-.explanation-panel h3 {
-  font-family: 'Segoe UI', sans-serif;
-  color: #2c3e50;
+.explanation-panel button {
+  display: block;
   margin-bottom: 10px;
-}
-
-.explanation-panel p {
-  font-family: 'Segoe UI', sans-serif;
-  color: #34495e;
-  line-height: 1.5;
 }
 
 /* Search container styling */
 .search-container {
-  width: 95%;
+  width: 90%;
   max-width: 600px;
   background: #fff;
-  border: 2px solid #3498db;
-  border-radius: 8px;
-  padding: 20px;
+  border: 2px solid #ccc;
+  padding: 15px;
   margin-bottom: 20px;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .search-container h2 {
-  font-size: 24px;
-  margin-bottom: 15px;
-  color: #2c3e50;
+  margin-top: 0;
 }
 
 .search-container input[type="number"] {
-  padding: 10px;
+  padding: 5px;
   font-size: 16px;
-  width: 70%;
-  margin-bottom: 15px;
-  border: 1px solid #3498db;
-  border-radius: 5px;
+  width: 60%;
+  margin-bottom: 10px;
 }
 
 .search-buttons {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .search-container button {
-  padding: 10px 20px;
+  padding: 5px 10px;
   font-size: 16px;
 }
 
@@ -185,34 +135,6 @@ button:active {
 .search-container .note {
   font-size: 12px;
   color: #555;
-}
-
-/* Search Explanation Panel styling */
-#searchExplanationPanel {
-  display: none;
-  position: fixed;
-  top: 20%;
-  left: 5%;
-  width: 350px;
-  max-width: 90%;
-  background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 20px;
-  z-index: 1000;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-  transition: all 0.3s ease-in-out;
-}
-
-#searchExplanationPanel h2,
-#searchExplanationPanel h3 {
-  color: #2c3e50;
-  margin-bottom: 10px;
-}
-
-#searchExplanationPanel p {
-  color: #34495e;
-  line-height: 1.5;
 }
 
 /* Pulse animation for completion */
@@ -230,6 +152,10 @@ button:active {
 
 .bar.search-result {
   animation: highlightPulse 1s ease-in-out;
+}
+
+.bar.sorted-animation {
+  animation: pulse 0.5s ease-in-out;
 }
 
 /* Responsive adjustments */

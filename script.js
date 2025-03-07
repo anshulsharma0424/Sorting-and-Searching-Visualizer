@@ -1,3 +1,4 @@
+// script.js
 import { bubbleSort } from './algorithms/bubbleSort.js';
 import { selectionSort } from './algorithms/selectionSort.js';
 import { insertionSort } from './algorithms/insertionSort.js';
@@ -9,7 +10,6 @@ import { linearSearch } from './searching/linearSearch.js';
 import { binarySearch } from './searching/binarySearch.js';
 import { getSearchExplanation } from './searchExplanations.js';
 
-// DOM Elements
 const arrayContainer = document.getElementById("arrayContainer");
 const generateArrayBtn = document.getElementById("generateArray");
 const startSortBtn = document.getElementById("startSort");
@@ -32,31 +32,14 @@ const searchExplanationPanel = document.getElementById("searchExplanationPanel")
 const searchExplanationContent = document.getElementById("searchExplanationContent");
 const closeSearchExplanationBtn = document.getElementById("closeSearchExplanation");
 
-// Global Variables
 let array = [];
-let isSorted = false; // Tracks whether the current array is sorted
+let isSorted = false; // Tracks if the current array is sorted
 
 // Constants for speed mapping
 const MIN_DELAY = 10;
 const MAX_DELAY = 500;
 
-// --- Functions to enable/disable Binary Search button ---
-function disableBinarySearch() {
-  binarySearchBtn.disabled = true;
-  binarySearchBtn.style.opacity = "0.5";
-  binarySearchBtn.style.cursor = "not-allowed";
-}
-
-function enableBinarySearch() {
-  binarySearchBtn.disabled = false;
-  binarySearchBtn.style.opacity = "1";
-  binarySearchBtn.style.cursor = "pointer";
-}
-
-// Initially, disable binary search (unsorted array)
-disableBinarySearch();
-
-// --- Generate Array ---
+// Generate array and display bars with numbers
 function generateArray() {
   isSorted = false; // New array is unsorted
   array = [];
@@ -79,15 +62,16 @@ function generateArray() {
     
     arrayContainer.appendChild(bar);
   }
-  // Always enable Linear Search; Binary Search stays disabled until sorted
+  // When a new unsorted array is generated, disable binary search.
+  binarySearchBtn.disabled = true;
+  // Linear search is always enabled.
   linearSearchBtn.disabled = false;
-  disableBinarySearch();
 }
 
 generateArrayBtn.addEventListener("click", generateArray);
 arraySizeSlider.addEventListener("input", generateArray);
 
-// --- Sorting Explanation Panel ---
+// Toggle sorting explanation panel
 toggleExplanationBtn.addEventListener("click", () => {
   explanationPanel.style.display = "block";
   const algorithm = algorithmSelect.value;
@@ -97,7 +81,7 @@ closeExplanationBtn.addEventListener("click", () => {
   explanationPanel.style.display = "none";
 });
 
-// --- Search Explanation Panel ---
+// Toggle search explanation panel
 toggleSearchExplanationBtn.addEventListener("click", () => {
   searchExplanationPanel.style.display = "block";
   searchExplanationContent.innerHTML = getSearchExplanation();
@@ -106,50 +90,53 @@ closeSearchExplanationBtn.addEventListener("click", () => {
   searchExplanationPanel.style.display = "none";
 });
 
-// --- Animate Completion ---
-// After sorting, run an animation, then revert bars back to original blue after 2 seconds.
+// Function to animate all bars on completion
 function animateCompletion(bars) {
+  // Add the completion animation class to each bar
   for (const bar of bars) {
     bar.classList.add("sorted-animation");
   }
+  // Remove the animation class after 1 second (animation duration)
   setTimeout(() => {
     for (const bar of bars) {
       bar.classList.remove("sorted-animation");
     }
-    // Wait 2 more seconds before reverting the bar color to original blue
+    // Wait 2 more seconds before reverting the bar color to blue
     setTimeout(() => {
       for (const bar of bars) {
-        bar.style.backgroundColor = "#3498db";
+        bar.style.backgroundColor = "#3498db"; // original blue color
       }
     }, 2000);
   }, 1000);
 }
 
-// --- Main Sorting Control with Real-Time Timer ---
+
+// Main sorting control with real-time timer
 startSortBtn.addEventListener("click", async () => {
-  // Disable controls during sorting
+  // Disable controls during the sort
   generateArrayBtn.disabled = true;
   startSortBtn.disabled = true;
   arraySizeSlider.disabled = true;
   speedSlider.disabled = true;
   algorithmSelect.disabled = true;
   toggleExplanationBtn.disabled = true;
-  // Disable search buttons during sorting
+  // Disable both search buttons during sorting
   linearSearchBtn.disabled = true;
   binarySearchBtn.disabled = true;
   toggleSearchExplanationBtn.disabled = true;
   
-  // Reset timer and start real-time timer update
+  // Reset and start timer
   timerDisplay.innerText = "Time: 0 ms";
   const startTime = performance.now();
   const timerInterval = setInterval(() => {
-    const elapsedTime = Math.round(performance.now() - startTime);
+    const currentTime = performance.now();
+    const elapsedTime = Math.round(currentTime - startTime);
     timerDisplay.innerText = `Time: ${elapsedTime} ms`;
   }, 16);
   
   // Inverse mapping: higher slider value → lower delay (faster sort)
   const sliderVal = parseInt(speedSlider.value);
-  const delay = MAX_DELAY + MIN_DELAY - sliderVal;
+  const delay = MAX_DELAY + MIN_DELAY - sliderVal; // e.g., slider=10 → delay=500; slider=500 → delay=10
   
   const bars = document.getElementsByClassName("bar");
   const algorithm = algorithmSelect.value;
@@ -188,7 +175,7 @@ startSortBtn.addEventListener("click", async () => {
   // Mark the array as sorted so that both search options are now available
   isSorted = true;
   linearSearchBtn.disabled = false;
-  enableBinarySearch();
+  binarySearchBtn.disabled = false;
   toggleSearchExplanationBtn.disabled = false;
   
   // Re-enable other controls after sorting is complete
@@ -200,37 +187,41 @@ startSortBtn.addEventListener("click", async () => {
   toggleExplanationBtn.disabled = false;
 });
 
+
+
+
 // --- Search Event Listeners ---
 
-// Linear Search (always available)
+// Linear Search button (always available when not sorting)
 linearSearchBtn.addEventListener("click", async () => {
-  // Validate that search field is not empty
-  if (searchValueInput.value.trim() === "") {
-    alert("Search field cannot be empty. Please enter a number.");
+  const input = searchValueInput.value.trim();
+  if (!input) {
+    alert("Please enter a valid number to search.");
     return;
   }
-  const target = Number(searchValueInput.value);
+  const target = Number(input);
   if (isNaN(target)) {
     alert("Please enter a valid number to search.");
     return;
   }
+  // Inverse mapping: use same delay mapping as sorting (optional)
   const sliderVal = parseInt(speedSlider.value);
   const delay = MAX_DELAY + MIN_DELAY - sliderVal;
   await linearSearch(array, document.getElementsByClassName("bar"), target, delay);
 });
 
-// Binary Search (available only if array is sorted)
+// Binary Search button (available only if array is sorted)
 binarySearchBtn.addEventListener("click", async () => {
   if (!isSorted) {
     alert("Binary Search is available only after sorting!");
     return;
   }
-  // Validate that search field is not empty
-  if (searchValueInput.value.trim() === "") {
-    alert("Search field cannot be empty. Please enter a number.");
+  const input = searchValueInput.value.trim();
+  if (!input) {
+    alert("Please enter a valid number to search.");
     return;
   }
-  const target = Number(searchValueInput.value);
+  const target = Number(input);
   if (isNaN(target)) {
     alert("Please enter a valid number to search.");
     return;
@@ -240,5 +231,5 @@ binarySearchBtn.addEventListener("click", async () => {
   await binarySearch(array, document.getElementsByClassName("bar"), target, delay);
 });
 
-// --- Generate Initial Array on Page Load ---
+// Generate an initial array on page load
 window.addEventListener("load", generateArray);
