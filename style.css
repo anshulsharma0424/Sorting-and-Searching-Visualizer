@@ -1,0 +1,240 @@
+/* General styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header styling */
+header {
+  background-color: #3498db;
+  width: 100%;
+  padding: 15px 0;
+  text-align: center;
+  color: #fff;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* Controls styling */
+.controls {
+  margin: 20px;
+  padding: 10px;
+  background: #f1f8ff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.controls label {
+  margin: 0 5px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.controls select,
+.controls input[type="range"] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Button styling */
+button {
+  background-color: #3498db;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background-color: #2980b9;
+  transform: scale(1.0);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Timer display styling */
+#timerDisplay {
+  margin-left: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Array container styling */
+.array-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 90%;
+  height: 400px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  margin-bottom: 20px;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Bar styling */
+.bar {
+  position: relative;
+  background-color: #3498db;
+  margin: 1px;
+  width: calc(100% / 50 - 2px);
+  transition: height 0.3s ease, background-color 0.3s ease;
+}
+
+/* Number displayed at the top of each bar */
+/* Number displayed at the top of each bar */
+.bar-number {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #000; /* Changed from white to black for better visibility */
+  font-weight: bold;
+}
+
+
+/* Explanation panel styling */
+.explanation-panel {
+  display: none;
+  position: fixed;
+  top: 15%;
+  right: 5%;
+  width: 350px;
+  max-width: 90%;
+  background: linear-gradient(135deg, #f6f9fc, #e9eff5);
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 1000;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+.explanation-panel h2,
+.explanation-panel h3 {
+  font-family: 'Segoe UI', sans-serif;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.explanation-panel p {
+  font-family: 'Segoe UI', sans-serif;
+  color: #34495e;
+  line-height: 1.5;
+}
+
+/* Search container styling */
+.search-container {
+  width: 95%;
+  max-width: 600px;
+  background: #fff;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.search-container h2 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.search-container input[type="number"] {
+  padding: 10px;
+  font-size: 16px;
+  width: 70%;
+  margin-bottom: 15px;
+  border: 1px solid #3498db;
+  border-radius: 5px;
+}
+
+.search-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.search-container button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+/* Note styling for search section */
+.search-container .note {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Search Explanation Panel styling */
+#searchExplanationPanel {
+  display: none;
+  position: fixed;
+  top: 20%;
+  left: 5%;
+  width: 350px;
+  max-width: 90%;
+  background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 1000;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+#searchExplanationPanel h2,
+#searchExplanationPanel h3 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+#searchExplanationPanel p {
+  color: #34495e;
+  line-height: 1.5;
+}
+
+/* Pulse animation for completion */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes highlightPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.bar.search-result {
+  animation: highlightPulse 1s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .array-container {
+    height: 300px;
+  }
+}
