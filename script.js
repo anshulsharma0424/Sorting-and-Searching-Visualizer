@@ -1,60 +1,74 @@
-// script.js
-import { bubbleSort } from './algorithms/bubbleSort.js';
-import { selectionSort } from './algorithms/selectionSort.js';
-import { insertionSort } from './algorithms/insertionSort.js';
-import { mergeSort } from './algorithms/mergeSort.js';
-import { quickSort } from './algorithms/quickSort.js';
-import { heapSort } from './algorithms/heapSort.js';
-import { getExplanation } from './explanations.js';
-import { linearSearch } from './searching/linearSearch.js';
-import { binarySearch } from './searching/binarySearch.js';
-import { getSearchExplanation } from './searchExplanations.js';
+// main.js
 
-const arrayContainer = document.getElementById("arrayContainer");
+// Import sorting algorithms from "Sorting algorithms" folder
+import { bubbleSort } from './Sorting algorithms/bubbleSort.js';
+import { selectionSort } from './Sorting algorithms/selectionSort.js';
+import { insertionSort } from './Sorting algorithms/insertionSort.js';
+import { mergeSort } from './Sorting algorithms/mergeSort.js';
+import { quickSort } from './Sorting algorithms/quickSort.js';
+import { heapSort } from './Sorting algorithms/heapSort.js';
+
+// Import animated searching algorithms from "Searching algorithms" folder
+import { linearSearchAnimated } from './Searching algorithms/linearSearch.js';
+import { binarySearchAnimated } from './Searching algorithms/binarySearch.js';
+
+// Import explanations
+import { getSortingExplanation } from './explanations/sortingAlgorithmsExplanations.js';
+import { getSearchingExplanation } from './explanations/searchingAlgorithmsExplanations.js';
+
+// Get references to DOM elements
+const arrayContainer   = document.getElementById("arrayContainer");
 const generateArrayBtn = document.getElementById("generateArray");
-const startSortBtn = document.getElementById("startSort");
-const algorithmSelect = document.getElementById("algorithm");
-const speedSlider = document.getElementById("speed");
-const arraySizeSlider = document.getElementById("arraySize");
-const timerDisplay = document.getElementById("timerDisplay");
+const startSortBtn     = document.getElementById("startSort");
+const algorithmSelect  = document.getElementById("algorithm");
+const speedSlider      = document.getElementById("speed");
+const arraySizeSlider  = document.getElementById("arraySize");
+const timerDisplay     = document.getElementById("timerDisplay");
 
-const searchValueInput = document.getElementById("searchValue");
-const linearSearchBtn = document.getElementById("linearSearchBtn");
-const binarySearchBtn = document.getElementById("binarySearchBtn");
-const toggleSearchExplanationBtn = document.getElementById("toggleSearchExplanation");
-
-const explanationPanel = document.getElementById("explanationPanel");
 const explanationContent = document.getElementById("explanationContent");
-const toggleExplanationBtn = document.getElementById("toggleExplanation");
-const closeExplanationBtn = document.getElementById("closeExplanation");
 
-const searchExplanationPanel = document.getElementById("searchExplanationPanel");
-const searchExplanationContent = document.getElementById("searchExplanationContent");
-const closeSearchExplanationBtn = document.getElementById("closeSearchExplanation");
+const searchValueInput   = document.getElementById("searchValue");
+const linearSearchBtn    = document.getElementById("linearSearchBtn");
+const binarySearchBtn    = document.getElementById("binarySearchBtn");
+const searchInfoBtn      = document.getElementById("searchInfoBtn");
+const searchResult       = document.getElementById("searchResult");
 
-let array = [];
-let isSorted = false; // Tracks if the current array is sorted
-
-// Constants for speed mapping
+// Global state
+let array    = [];
+let isSorted = false; // true after a sort operation completes
 const MIN_DELAY = 10;
 const MAX_DELAY = 500;
 
-// Generate array and display bars with numbers
+/* Helper: Reset all bar colors to the default (#4f7c82) */
+function resetBarColors() {
+  const bars = document.getElementsByClassName("bar");
+  for (const bar of bars) {
+    bar.style.backgroundColor = "#4f7c82";
+    bar.style.border = "";
+  }
+}
+
+/* Generate a new random array and create bar elements */
 function generateArray() {
-  isSorted = false; // New array is unsorted
   array = [];
+  isSorted = false;
+  binarySearchBtn.disabled = true; // Disable binary search until sorted
+  searchResult.innerText = "";
+  searchResult.classList.remove("visible");
   arrayContainer.innerHTML = "";
+  
   const size = parseInt(arraySizeSlider.value);
   const barWidth = Math.floor(arrayContainer.clientWidth / size) - 2;
+  
   for (let i = 0; i < size; i++) {
     const value = Math.floor(Math.random() * 300) + 20;
     array.push(value);
+    
     const bar = document.createElement("div");
     bar.classList.add("bar");
     bar.style.height = `${value}px`;
-    bar.style.width = `${barWidth}px`;
+    bar.style.width  = `${barWidth}px`;
     
-    // Create and append number element
     const numberElem = document.createElement("div");
     numberElem.classList.add("bar-number");
     numberElem.innerText = value;
@@ -62,85 +76,31 @@ function generateArray() {
     
     arrayContainer.appendChild(bar);
   }
-  // When a new unsorted array is generated, disable binary search.
-  binarySearchBtn.disabled = true;
-  // Linear search is always enabled.
-  linearSearchBtn.disabled = false;
 }
 
-generateArrayBtn.addEventListener("click", generateArray);
-arraySizeSlider.addEventListener("input", generateArray);
-
-// Toggle sorting explanation panel
-toggleExplanationBtn.addEventListener("click", () => {
-  explanationPanel.style.display = "block";
-  const algorithm = algorithmSelect.value;
-  explanationContent.innerHTML = getExplanation(algorithm);
-});
-closeExplanationBtn.addEventListener("click", () => {
-  explanationPanel.style.display = "none";
-});
-
-// Toggle search explanation panel
-toggleSearchExplanationBtn.addEventListener("click", () => {
-  searchExplanationPanel.style.display = "block";
-  searchExplanationContent.innerHTML = getSearchExplanation();
-});
-closeSearchExplanationBtn.addEventListener("click", () => {
-  searchExplanationPanel.style.display = "none";
-});
-
-// Function to animate all bars on completion
-function animateCompletion(bars) {
-  // Add the completion animation class to each bar
-  for (const bar of bars) {
-    bar.classList.add("sorted-animation");
-  }
-  // Remove the animation class after 1 second (animation duration)
-  setTimeout(() => {
-    for (const bar of bars) {
-      bar.classList.remove("sorted-animation");
-    }
-    // Wait 2 more seconds before reverting the bar color to blue
-    setTimeout(() => {
-      for (const bar of bars) {
-        bar.style.backgroundColor = "#3498db"; // original blue color
-      }
-    }, 2000);
-  }, 1000);
-}
-
-
-// Main sorting control with real-time timer
-startSortBtn.addEventListener("click", async () => {
-  // Disable controls during the sort
+/* Sort the array with a real-time timer and animate the process */
+async function startSorting() {
+  // Disable controls during sorting
   generateArrayBtn.disabled = true;
-  startSortBtn.disabled = true;
-  arraySizeSlider.disabled = true;
-  speedSlider.disabled = true;
-  algorithmSelect.disabled = true;
-  toggleExplanationBtn.disabled = true;
-  // Disable both search buttons during sorting
-  linearSearchBtn.disabled = true;
-  binarySearchBtn.disabled = true;
-  toggleSearchExplanationBtn.disabled = true;
+  startSortBtn.disabled     = true;
+  arraySizeSlider.disabled  = true;
+  speedSlider.disabled      = true;
+  algorithmSelect.disabled  = true;
   
-  // Reset and start timer
   timerDisplay.innerText = "Time: 0 ms";
   const startTime = performance.now();
   const timerInterval = setInterval(() => {
-    const currentTime = performance.now();
-    const elapsedTime = Math.round(currentTime - startTime);
-    timerDisplay.innerText = `Time: ${elapsedTime} ms`;
+    const elapsed = Math.round(performance.now() - startTime);
+    timerDisplay.innerText = `Time: ${elapsed} ms`;
   }, 16);
   
-  // Inverse mapping: higher slider value → lower delay (faster sort)
+  // Determine animation delay from the speed slider
   const sliderVal = parseInt(speedSlider.value);
-  const delay = MAX_DELAY + MIN_DELAY - sliderVal; // e.g., slider=10 → delay=500; slider=500 → delay=10
-  
+  const delay = MAX_DELAY + MIN_DELAY - sliderVal;
   const bars = document.getElementsByClassName("bar");
   const algorithm = algorithmSelect.value;
   
+  // Call the chosen sorting algorithm
   switch (algorithm) {
     case "bubble":
       await bubbleSort(array, bars, delay);
@@ -164,72 +124,169 @@ startSortBtn.addEventListener("click", async () => {
       break;
   }
   
-  // Stop the timer and update display with final time
   clearInterval(timerInterval);
-  const finalElapsed = Math.round(performance.now() - startTime);
-  timerDisplay.innerText = `Time: ${finalElapsed} ms`;
+  const finalTime = Math.round(performance.now() - startTime);
+  timerDisplay.innerText = `Time: ${finalTime} ms`;
   
-  // Run final animation on completion
-  animateCompletion(bars);
-  
-  // Mark the array as sorted so that both search options are now available
   isSorted = true;
-  linearSearchBtn.disabled = false;
   binarySearchBtn.disabled = false;
-  toggleSearchExplanationBtn.disabled = false;
   
-  // Re-enable other controls after sorting is complete
+  // Animate completion: pulse then reset to default color
+  animateCompletion(bars);
+  // After 1 second, reset bars to default color
+  setTimeout(resetBarColors, 1000);
+  
+  // Re-enable controls
   generateArrayBtn.disabled = false;
-  startSortBtn.disabled = false;
-  arraySizeSlider.disabled = false;
-  speedSlider.disabled = false;
-  algorithmSelect.disabled = false;
-  toggleExplanationBtn.disabled = false;
-});
+  startSortBtn.disabled     = false;
+  arraySizeSlider.disabled  = false;
+  speedSlider.disabled      = false;
+  algorithmSelect.disabled  = false;
+}
 
-
-
-
-// --- Search Event Listeners ---
-
-// Linear Search button (always available when not sorting)
-linearSearchBtn.addEventListener("click", async () => {
-  const input = searchValueInput.value.trim();
-  if (!input) {
-    alert("Please enter a valid number to search.");
-    return;
+/* Animate bars with a pulse effect then reset to default color */
+function animateCompletion(bars) {
+  for (const bar of bars) {
+    bar.classList.add("sorted-animation");
   }
-  const target = Number(input);
+  setTimeout(() => {
+    for (const bar of bars) {
+      bar.style.backgroundColor = "#4f7c82";
+      bar.classList.remove("sorted-animation");
+    }
+  }, 1000);
+}
+
+/* Clear any highlights (used in searching) */
+function clearSearchHighlights() {
+  const bars = document.getElementsByClassName("bar");
+  for (const bar of bars) {
+    bar.style.backgroundColor = "#4f7c82";
+    bar.style.border = "";
+  }
+}
+
+/* Highlight a found bar */
+function highlightBar(index) {
+  const bars = document.getElementsByClassName("bar");
+  if (bars[index]) {
+    bars[index].style.border = "3px solid #007aff"; // Apple's blue accent
+  }
+}
+
+/* Handle Linear Search Animation with real-time timer */
+async function handleLinearSearch() {
+  clearSearchHighlights();
+  searchResult.classList.remove("visible");
+
+  const target = parseInt(searchValueInput.value);
   if (isNaN(target)) {
-    alert("Please enter a valid number to search.");
+    searchResult.innerText = "Please enter a valid number.";
+    searchResult.classList.add("visible");
     return;
   }
-  // Inverse mapping: use same delay mapping as sorting (optional)
+  
+  // Initialize timer display for search
+  timerDisplay.innerText = "Time: 0 ms";
+  const startTime = performance.now();
+  const timerInterval = setInterval(() => {
+    const elapsed = Math.round(performance.now() - startTime);
+    timerDisplay.innerText = `Time: ${elapsed} ms`;
+  }, 16);
+  
   const sliderVal = parseInt(speedSlider.value);
   const delay = MAX_DELAY + MIN_DELAY - sliderVal;
-  await linearSearch(array, document.getElementsByClassName("bar"), target, delay);
-});
+  const bars = document.getElementsByClassName("bar");
+  
+  // Call the linear search animation function
+  const index = await linearSearchAnimated(array, bars, target, delay);
+  
+  // Stop the timer and display final elapsed time
+  clearInterval(timerInterval);
+  const finalTime = Math.round(performance.now() - startTime);
+  timerDisplay.innerText = `Time: ${finalTime} ms`;
 
-// Binary Search button (available only if array is sorted)
-binarySearchBtn.addEventListener("click", async () => {
+  if (index !== -1) {
+    searchResult.innerText = `Element ${target} found at index ${index}.`;
+    highlightBar(index);
+  } else {
+    searchResult.innerText = `Element ${target} not found.`;
+  }
+  searchResult.classList.add("visible");
+  
+  // Reset bar colors after search animation (1s delay)
+  setTimeout(resetBarColors, 1000);
+}
+
+/* Handle Binary Search Animation with real-time timer */
+async function handleBinarySearch() {
+  clearSearchHighlights();
+  searchResult.classList.remove("visible");
+
+  const target = parseInt(searchValueInput.value);
+  if (isNaN(target)) {
+    searchResult.innerText = "Please enter a valid number.";
+    searchResult.classList.add("visible");
+    return;
+  }
+  
+  // Initialize timer display for search
+  timerDisplay.innerText = "Time: 0 ms";
+  const startTime = performance.now();
+  const timerInterval = setInterval(() => {
+    const elapsed = Math.round(performance.now() - startTime);
+    timerDisplay.innerText = `Time: ${elapsed} ms`;
+  }, 16);
+  
+  const sliderVal = parseInt(speedSlider.value);
+  const delay = MAX_DELAY + MIN_DELAY - sliderVal;
+  const bars = document.getElementsByClassName("bar");
+  
+  let index = -1;
   if (!isSorted) {
-    alert("Binary Search is available only after sorting!");
-    return;
+    searchResult.innerText = "Array is not sorted. Using linear search animation.";
+    searchResult.classList.add("visible");
+    index = await linearSearchAnimated(array, bars, target, delay);
+  } else {
+    index = await binarySearchAnimated(array, bars, target, delay);
   }
-  const input = searchValueInput.value.trim();
-  if (!input) {
-    alert("Please enter a valid number to search.");
-    return;
+  
+  // Stop the timer and display final elapsed time
+  clearInterval(timerInterval);
+  const finalTime = Math.round(performance.now() - startTime);
+  timerDisplay.innerText = `Time: ${finalTime} ms`;
+  
+  if (index !== -1) {
+    searchResult.innerText = `Element ${target} found at index ${index}.`;
+    highlightBar(index);
+  } else {
+    searchResult.innerText = `Element ${target} not found.`;
   }
-  const target = Number(input);
-  if (isNaN(target)) {
-    alert("Please enter a valid number to search.");
-    return;
-  }
-  const sliderVal = parseInt(speedSlider.value);
-  const delay = MAX_DELAY + MIN_DELAY - sliderVal;
-  await binarySearch(array, document.getElementsByClassName("bar"), target, delay);
+  searchResult.classList.add("visible");
+  
+  setTimeout(resetBarColors, 1000);
+}
+
+/* Handle Search Info: Display search explanation */
+function handleSearchInfo() {
+  const info = getSearchingExplanation();
+  explanationContent.innerHTML = info;
+}
+
+/* Event Listeners */
+generateArrayBtn.addEventListener("click", generateArray);
+arraySizeSlider.addEventListener("input", generateArray);
+startSortBtn.addEventListener("click", startSorting);
+linearSearchBtn.addEventListener("click", handleLinearSearch);
+binarySearchBtn.addEventListener("click", handleBinarySearch);
+searchInfoBtn.addEventListener("click", handleSearchInfo);
+
+algorithmSelect.addEventListener("change", () => {
+  const algo = algorithmSelect.value;
+  explanationContent.innerHTML = getSortingExplanation(algo);
 });
 
-// Generate an initial array on page load
-window.addEventListener("load", generateArray);
+window.addEventListener("load", () => {
+  generateArray();
+  explanationContent.innerHTML = getSortingExplanation(algorithmSelect.value);
+});
